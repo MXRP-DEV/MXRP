@@ -1,0 +1,24 @@
+{
+  "name": "@discord/bot",
+  "version": "1.0.0",
+  "description": "Discord bot application",
+  "private": true,
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "dev": "node index.js",
+    "start": "node index.js",
+    "lint": "eslint . --ext .js",
+    "format": "prettier --write \"**/*.{js,json,md}\"",
+    "format:check": "prettier --check \"**/*.{js,json,md}\""
+  },
+  "dependencies": {
+    "discord.js": "^14.25.1",
+    "erlc-api": "^3.3.1",
+    "mongoose": "^9.2.1"
+  },
+  "devDependencies": {
+    "eslint": "^10.0.1",
+    "prettier": "^3.8.1"
+  }
+}

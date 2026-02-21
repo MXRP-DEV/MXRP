@@ -1,0 +1,27 @@
+{
+  "name": "discord-monorepo",
+  "version": "1.0.0",
+  "description": "Discord bot monorepo with Turborepo",
+  "private": true,
+  "packageManager": "pnpm@10.29.2",
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "start": "turbo run start",
+    "lint": "turbo run lint",
+    "format": "turbo run format",
+    "format:check": "turbo run format:check",
+    "test": "turbo run test",
+    "clean": "turbo run clean"
+  },
+  "engines": {
+    "node": ">=25.6.1"
+  },
+  "devDependencies": {
+    "turbo": "^2.8.10",
+    "prettier": "^3.8.1",
+    "eslint": "^10.0.1",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.5"
+  }
+}
