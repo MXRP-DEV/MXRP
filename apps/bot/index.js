@@ -1,10 +1,10 @@
+import { config } from 'dotenv';
+config({ path: '.env' });
 import { Client, Partials, Options, GatewayIntentBits } from 'discord.js';
-import { LoadEvents } from './src/Handlers/eventHandler.js';
-import { LoadCommands } from './src/Handlers/commandHandler.js';
-import { LoadComponents } from './src/Handlers/ComponentHandler.js';
-import { databaseManager } from './src/Database/connection.js';
-import { loadEnvFile } from 'node:process';
-loadEnvFile();
+import { LoadEvents } from '#handlers/eventHandler.js';
+import { LoadCommands } from '#handlers/commandHandler.js';
+import { LoadComponents } from '#handlers/ComponentHandler.js';
+import { databaseManager } from '#database/connection.js';
 
 const client = new Client({
   intents: [
