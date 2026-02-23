@@ -1,5 +1,6 @@
+import { createBackupClient } from 'discord-backup-v2';
 import { Events, ActivityType } from 'discord.js';
-import { logger } from '../../Functions/Logger.js';
+import { logger } from '#functions/Logger.js';
 
 export default {
   name: Events.ClientReady,
@@ -13,5 +14,13 @@ export default {
       const activity = activities[Math.floor(Math.random() * activities.length)];
       client.user.setActivity(activity.name, { type: activity.type });
     }, 10_000);
+
+    // Client Backup - Global Access
+    client.backupClient = await createBackupClient({
+      storage: 'mongo',
+      mongoUri: process.env.MONGO_URI,
+    });
+
+    logger.info('Backup Client Ready', client.backupClient.ready);
   },
 };

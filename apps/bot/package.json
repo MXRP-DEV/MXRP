@@ -5,6 +5,17 @@
   "private": true,
   "type": "module",
   "main": "index.js",
+  "imports": {
+    "#commands/*": "./src/Commands/*",
+    "#components/*": "./src/Components/*",
+    "#events/*": "./src/Events/*",
+    "#handlers/*": "./src/Handlers/*",
+    "#functions/*": "./src/Functions/*",
+    "#database/*": "./src/Database/*",
+    "#models/*": "./src/Database/models/*",
+    "#config/*": "./src/Config/*",
+    "#utils/*": "./src/Utils/*"
+  },
   "scripts": {
     "dev": "node index.js",
     "start": "node index.js",
@@ -13,9 +24,13 @@
     "format:check": "prettier --check \"**/*.{js,json,md}\""
   },
   "dependencies": {
+    "discord-backup-v2": "3.5.4-beta.1",
+    "discord-html-transcripts-v2": "^3.3.1",
     "discord.js": "^14.25.1",
+    "dotenv": "^17.3.1",
     "erlc-api": "^3.3.1",
-    "mongoose": "^9.2.1"
+    "mongoose": "^9.2.1",
+    "node-fetch": "^3.3.2"
   },
   "devDependencies": {
     "eslint": "^10.0.1",
