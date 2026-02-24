@@ -1,0 +1,64 @@
+# Node.js
+**/node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+yarn.lock
+.pnpm-debug.log*
+
+# Entorno
+.env
+.env.local
+.env.*.local
+
+# Logs
+logs/
+*.log
+
+# Docker
+Dockerfile
+docker-compose*.yml
+.dockerignore
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# IDE/Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Testing
+coverage/
+.nyc_output/
+
+# Build/Cache
+dist/
+build/
+.cache/
+
+# Backups
+backups/
+*.backup
+
+# Documentación
+README.md
+CHANGELOG.md
+LICENSE
+*.md
+
+# Otros
+.github/
+.eslintrc
+.prettierrc
+.eslintignore
+.prettierignore

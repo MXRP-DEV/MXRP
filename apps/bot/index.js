@@ -5,6 +5,7 @@ import { LoadEvents } from '#handlers/eventHandler.js';
 import { LoadCommands } from '#handlers/commandHandler.js';
 import { LoadComponents } from '#handlers/ComponentHandler.js';
 import { databaseManager } from '#database/connection.js';
+import { setupAntiCrash } from '#handlers/antiCrash.js';
 
 const client = new Client({
   intents: [
@@ -63,6 +64,9 @@ const client = new Client({
 });
 
 await databaseManager.connect();
+
+// Inicializar sistema AntiCrash antes de cargar handlers
+setupAntiCrash(client);
 
 await LoadEvents(client);
 await LoadComponents(client);
