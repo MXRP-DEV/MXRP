@@ -7,7 +7,7 @@ import {
 import { COMMAND_SCOPES } from '#config/guilds.js';
 
 export default {
-  scope: COMMAND_SCOPES.DEV,
+  scope: COMMAND_SCOPES.MXRPDI,
   data: new SlashCommandBuilder()
     .setName('config')
     .setDescription('Configure el bot para el servidor')
@@ -105,6 +105,77 @@ export default {
             .setName('asuntos')
             .setDescription('Rol de Asuntos Internos (Se usara para hacer ping)')
             .setRequired(true)
+        )
+    )
+    .addSubcommandGroup((option) =>
+      option
+        .setName('apelar')
+        .setDescription('Configurar sistema de apelaciones')
+        .addSubcommand((sub) =>
+          sub
+            .setName('despidos')
+            .setDescription('Configurar sistema de apelaciones de despidos')
+            .addChannelOption((option) =>
+              option
+                .setName('canal')
+                .setDescription('Canal donde se registraran las apelaciones de despidos')
+                .addChannelTypes(ChannelType.GuildText)
+                .setRequired(true)
+            )
+            .addRoleOption((option) =>
+              option
+                .setName('permiso')
+                .setDescription('Rol con permiso para crear las apelaciones de despidos')
+                .setRequired(true)
+            )
+            .addRoleOption((option) =>
+              option
+                .setName('rh')
+                .setDescription('Rol de Recursos Humanos (Se usara para hacer ping)')
+                .setRequired(true)
+            )
+        )
+        .addSubcommand((sub) =>
+          sub
+            .setName('blacklist')
+            .setDescription('Configurar sistema de blacklist')
+            .addChannelOption((option) =>
+              option
+                .setName('canal')
+                .setDescription('Canal donde se registraran las apelaciones de blacklist')
+                .addChannelTypes(ChannelType.GuildText)
+                .setRequired(true)
+            )
+            .addRoleOption((option) =>
+              option
+                .setName('permiso')
+                .setDescription('Rol con permiso para crear las apelaciones de blacklist')
+                .setRequired(true)
+            )
+            .addRoleOption((option) =>
+              option
+                .setName('asuntos')
+                .setDescription('Rol de Asuntos Internos (Se usara para hacer ping)')
+                .setRequired(true)
+            )
+        )
+        .addSubcommand((sub) =>
+          sub
+            .setName('wips')
+            .setDescription('Configurar sistema de WIPs')
+            .addChannelOption((option) =>
+              option
+                .setName('canal')
+                .setDescription('Canal donde se registraran las apelaciones de WIPs')
+                .addChannelTypes(ChannelType.GuildText)
+                .setRequired(true)
+            )
+            .addRoleOption((option) =>
+              option
+                .setName('permiso')
+                .setDescription('Rol con permiso para crear las apelaciones de WIPs')
+                .setRequired(true)
+            )
         )
     ),
 };

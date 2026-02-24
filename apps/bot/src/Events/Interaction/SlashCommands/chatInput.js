@@ -10,15 +10,18 @@ export default {
     if (!command) return;
 
     try {
-      // Verificar si es un subcomando
+      const subCommandGroupName = interaction.options.getSubcommandGroup(false);
       const subCommandName = interaction.options.getSubcommand(false);
 
       if (subCommandName) {
-        // Buscar el subcomando
+        const subCommandKey = subCommandGroupName
+          ? `${subCommandGroupName}.${subCommandName}`
+          : subCommandName;
+
         const subCommands = client.subCommands.get(interaction.commandName);
 
         if (subCommands) {
-          const subCommand = subCommands.get(subCommandName);
+          const subCommand = subCommands.get(subCommandKey);
 
           if (subCommand && subCommand.execute) {
             await subCommand.execute(interaction, client);
@@ -26,12 +29,13 @@ export default {
           }
         }
 
-        // Si no se encuentra el subcomando, intentar ejecutar el comando principal
         if (command.execute) {
           await command.execute(interaction, client);
         }
       } else {
-        // No es un subcomando, ejecutar comando principal
+        if (command.execute) {
+          await command.execute(interaction, client);
+        }
         if (command.execute) {
           await command.execute(interaction, client);
         }
