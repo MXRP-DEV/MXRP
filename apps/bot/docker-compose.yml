@@ -1,0 +1,32 @@
+services:
+  # Bot de Discord
+  discord-bot:
+    build:
+      context: ../..
+      dockerfile: apps/bot/Dockerfile
+    container_name: mxrp-discord-bot
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - DOCKER_ENV=true
+      - DISCORD_TOKEN=${DISCORD_TOKEN}
+      - DISCORD_CLIENT_ID=${DISCORD_CLIENT_ID}
+      - MONGODB_URI=${MONGODB_URI}
+    env_file:
+      - .env
+    volumes:
+      - ./logs:/app/logs
+      - ./backups:/app/backups
+    networks:
+      - bot-network
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 10s
+        max_attempts: 5
+        window: 120s
+
+# Redes
+networks:
+  bot-network:
+    driver: bridge
