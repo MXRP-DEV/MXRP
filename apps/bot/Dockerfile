@@ -2,6 +2,9 @@
 # Usa Node.js 20 LTS (Alpine para menor tamaño)
 FROM node:20-alpine
 
+# Instalar pnpm
+RUN npm install -g pnpm
+
 # Establecer directorio de trabajo
 WORKDIR /app
 
@@ -16,7 +19,7 @@ RUN apk add --no-cache \
 COPY apps/bot/package.json ./
 
 # Instalar dependencias con npm
-RUN npm install
+RUN pnpm install
 
 # Copiar el resto del código fuente del bot
 COPY apps/bot/ .
