@@ -51,10 +51,7 @@ export default {
       content: 'Creando ticket...',
     });
 
-    const channelName = `⚖️┋${user.username}`
-      .toLowerCase()
-      .replace(/ /g, '-')
-      .replace(/[^a-z0-9-]/g, '');
+    const channelName = `🗒️┋${user.username}`.toLowerCase().replace(/ /g, '-');
 
     const ticketChannel = await guild.channels.create({
       name: channelName,
@@ -90,7 +87,7 @@ export default {
       ],
     });
 
-    const textContent = `⚖️ **Apelaciones - WIPs, Despidos, Applications**
+    const textContent = `🗒️ **Apelaciones - WIPs, Despidos, Applications**
 
 Estimado <@${user.id}>, un <@&${setup.RH}> revisará tu solicitud.
 **Asunto:** ${Asunto}
