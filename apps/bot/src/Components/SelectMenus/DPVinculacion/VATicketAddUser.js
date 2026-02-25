@@ -21,7 +21,6 @@ export default {
       });
     }
 
-    // Verificar si el miembro tiene alguno de los roles de claim
     const hasPermission =
       member.roles.cache.has(ticketSetup.ClaimRole1) ||
       member.roles.cache.has(ticketSetup.ClaimRole2) ||
