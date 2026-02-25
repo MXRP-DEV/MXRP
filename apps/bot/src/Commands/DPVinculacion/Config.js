@@ -106,7 +106,24 @@ export default {
           opt.setName('inversor').setDescription('Rol Inversor').setRequired(true)
         )
     )
-
+    .addSubcommand((sub) =>
+      sub
+        .setName('welcome')
+        .setDescription('Configurar sistema de bienvenida')
+        .addChannelOption((option) =>
+          option
+            .setName('canal')
+            .setDescription('Canal donde se enviará el mensaje de bienvenida')
+            .addChannelTypes(ChannelType.GuildText)
+            .setRequired(true)
+        )
+        .addRoleOption((opt) =>
+          opt
+            .setName('rol')
+            .setDescription('Rol que se le asignara al usuario en bienvenida')
+            .setRequired(true)
+        )
+    )
     .addSubcommandGroup((group) =>
       group
         .setName('informes')
