@@ -46,10 +46,7 @@ export default {
       content: 'Creando ticket...',
     });
 
-    const channelName = `aclaracion-${user.username}`
-      .toLowerCase()
-      .replace(/ /g, '-')
-      .replace(/[^a-z0-9-]/g, '');
+    const channelName = `📨┋${user.username}`.toLowerCase().replace(/ /g, '-');
 
     const ticketChannel = await guild.channels.create({
       name: channelName,
@@ -77,7 +74,6 @@ export default {
       ],
     });
 
-    // Asignar rol de ticket abierto al usuario
     if (setup.OpenTicketRole) {
       const member = await guild.members.fetch(user.id);
       await member.roles.add(setup.OpenTicketRole);
@@ -133,11 +129,6 @@ Estimado <@${user.id}>, un <@&${setup.ClaimRole1}> revisará tu solicitud.
     await ticketChannel.send({
       flags: 'IsComponentsV2',
       components: [container],
-    });
-
-    // Ping al rol correspondiente
-    await ticketChannel.send({
-      content: `<@&${setup.ClaimRole1}>`,
     });
 
     await TicketUserVA.create({

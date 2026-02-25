@@ -38,7 +38,6 @@ export default {
       return interaction.editReply({ content: 'El canal de logs no es válido.' });
     }
 
-    // Remover rol de ticket abierto del creador
     if (setup.OpenTicketRole && ticket.CreadorId) {
       try {
         const member = await guild.members.fetch(ticket.CreadorId);
@@ -56,7 +55,7 @@ export default {
     });
 
     await logChannel.send({
-      content: `🔒 Ticket cerrado por <@${user.id}>\nRazón: ${reason}`,
+      content: `🔒 Ticket cerrado por <@${user.id}>\nRazón: ${reason} \nAtendido por: <@${ticket.StaffAsignado}>`,
       files: [transcript],
     });
 

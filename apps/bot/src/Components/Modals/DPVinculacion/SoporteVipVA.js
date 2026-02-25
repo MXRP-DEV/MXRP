@@ -41,7 +41,8 @@ export default {
 
     if (!hasVipRole && !hasPartnerRole && !hasInversorRole) {
       return interaction.editReply({
-        content: 'No tienes permiso para abrir tickets VIP. Este servicio es exclusivo para usuarios VIP, Partners o Inversores.',
+        content:
+          'No tienes permiso para abrir tickets VIP. Este servicio es exclusivo para usuarios VIP, Partners o Inversores.',
       });
     }
 
@@ -57,10 +58,7 @@ export default {
       content: 'Creando ticket VIP...',
     });
 
-    const channelName = `vip-${user.username}`
-      .toLowerCase()
-      .replace(/ /g, '-')
-      .replace(/[^a-z0-9-]/g, '');
+    const channelName = `💎┋${user.username}`.toLowerCase().replace(/ /g, '-');
 
     const ticketChannel = await guild.channels.create({
       name: channelName,
@@ -144,11 +142,6 @@ Estimado <@${user.id}>, un <@&${setup.ClaimRole3}> revisará tu solicitud.
     await ticketChannel.send({
       flags: 'IsComponentsV2',
       components: [container],
-    });
-
-    // Ping al rol correspondiente
-    await ticketChannel.send({
-      content: `<@&${setup.ClaimRole3}>`,
     });
 
     await TicketUserVA.create({
