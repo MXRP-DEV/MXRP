@@ -111,7 +111,6 @@ export default {
       group
         .setName('informes')
         .setDescription('Configurar sistema de informes')
-
         .addSubcommand((sub) =>
           sub
             .setName('gp1')
@@ -141,38 +140,6 @@ export default {
             )
             .addRoleOption((opt) =>
               opt.setName('rol').setDescription('Rol a pingear en informes GP2').setRequired(true)
-            )
-        )
-
-        .addSubcommand((sub) =>
-          sub
-            .setName('ae')
-            .setDescription('Configurar informes AE')
-            .addChannelOption((opt) =>
-              opt
-                .setName('canal')
-                .setDescription('Canal donde se enviarán los informes AE')
-                .addChannelTypes(ChannelType.GuildText)
-                .setRequired(true)
-            )
-            .addRoleOption((opt) =>
-              opt.setName('rol').setDescription('Rol a pingear en informes AE').setRequired(true)
-            )
-        )
-
-        .addSubcommand((sub) =>
-          sub
-            .setName('av')
-            .setDescription('Configurar informes AV')
-            .addChannelOption((opt) =>
-              opt
-                .setName('canal')
-                .setDescription('Canal donde se enviarán los informes AV')
-                .addChannelTypes(ChannelType.GuildText)
-                .setRequired(true)
-            )
-            .addRoleOption((opt) =>
-              opt.setName('rol').setDescription('Rol a pingear en informes AV').setRequired(true)
             )
         )
     ),
