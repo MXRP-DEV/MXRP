@@ -2,37 +2,31 @@ import {
   ModalSubmitInteraction,
   ChannelType,
   PermissionsBitField,
-  AttachmentBuilder,
-  MediaGalleryItemBuilder,
   ButtonBuilder,
   ButtonStyle,
   UserSelectMenuBuilder,
   ContainerBuilder,
   SeparatorSpacingSize,
-  EmbedBuilder,
 } from 'discord.js';
-import fetch from 'node-fetch';
-import TicketSetupDI from '#database/models/DPInterno/TicketSetupDI.js';
-import TicketUserDI from '#database/models/DPInterno/TicketUserDI.js';
+import TicketSetupVA from '#database/models/DPVinculacion/TicketSetupVA.js';
+import TicketUserVA from '#database/models/DPVinculacion/TicketUserVA.js';
 
 export default {
-  customId: 'ReporteStaffDI',
+  customId: 'SoporteVipVA',
+
   /**
    * @param {ModalSubmitInteraction} interaction
    * @param {Client} client
    */
   async execute(interaction, client) {
-    const { guild, user, fields } = interaction;
+    const { guild, user, fields, member } = interaction;
 
     const Asunto = fields.getTextInputValue('Asunto');
     const Detalles = fields.getTextInputValue('Detalles');
 
-    const evidenciasAttachments = fields.fields.get('Evidencias')?.attachments ?? new Map();
-    const Evidencias = Array.from(evidenciasAttachments.values());
-
     await interaction.deferReply({ flags: 'Ephemeral' });
 
-    const setup = await TicketSetupDI.findOne({ GuildId: guild.id });
+    const setup = await TicketSetupVA.findOne({ GuildId: guild.id });
 
     if (!setup) {
       return interaction.editReply({
@@ -40,25 +34,37 @@ export default {
       });
     }
 
-    const categoryId = setup.ReporteStaff;
+    // Verificar si el usuario tiene rol VIP, Partner o Inversor
+    const hasVipRole = setup.VipRole && member.roles.cache.has(setup.VipRole);
+    const hasPartnerRole = setup.PartnerRole && member.roles.cache.has(setup.PartnerRole);
+    const hasInversorRole = setup.InversorRole && member.roles.cache.has(setup.InversorRole);
+
+    if (!hasVipRole && !hasPartnerRole && !hasInversorRole) {
+      return interaction.editReply({
+        content:
+          'No tienes permiso para abrir tickets VIP. Este servicio es exclusivo para usuarios VIP, Partners o Inversores.',
+      });
+    }
+
+    const categoryId = setup.VIP;
 
     if (!categoryId) {
       return interaction.editReply({
-        content: 'No se encontró una categoría asignada para Reporte de Staff.',
+        content: 'No se encontró una categoría asignada para Soporte VIP.',
       });
     }
 
     interaction.editReply({
-      content: 'Creando ticket...',
+      content: 'Creando ticket VIP...',
     });
 
-    const channelName = `🛡️┋${user.username}`.toLowerCase().replace(/ /g, '-');
+    const channelName = `💎┋${user.username}`.toLowerCase().replace(/ /g, '-');
 
     const ticketChannel = await guild.channels.create({
       name: channelName,
       type: ChannelType.GuildText,
       parent: categoryId,
-      topic: `Ticket de ${user.tag} | Reporte de Staff`,
+      topic: `Ticket de ${user.tag} | Soporte VIP`,
       permissionOverwrites: [
         { id: guild.id, deny: [PermissionsBitField.Flags.ViewChannel] },
         {
@@ -70,15 +76,7 @@ export default {
           ],
         },
         {
-          id: setup.RH,
-          allow: [
-            PermissionsBitField.Flags.ViewChannel,
-            PermissionsBitField.Flags.SendMessages,
-            PermissionsBitField.Flags.ReadMessageHistory,
-          ],
-        },
-        {
-          id: setup.AsuntosInternos,
+          id: setup.ClaimRole3,
           allow: [
             PermissionsBitField.Flags.ViewChannel,
             PermissionsBitField.Flags.SendMessages,
@@ -88,37 +86,24 @@ export default {
       ],
     });
 
-    const textContent = `🛡️ **Reporte de Staff**
+    // Asignar rol de ticket abierto al usuario
+    if (setup.OpenTicketRole) {
+      await member.roles.add(setup.OpenTicketRole);
+    }
 
-Estimado <@${user.id}>, un <@&${setup.RH}> revisará tu solicitud.
+    const textContent = `💎 **Soporte VIP**
+
+Estimado <@${user.id}>, un <@&${setup.ClaimRole3}> revisará tu solicitud.
 **Asunto:** ${Asunto}
 **Detalles:** ${Detalles}
 
 **Información del Ticket**
 • Estado: Pendiente
+• Tipo: VIP
 • Creado: <t:${Math.floor(Date.now() / 1000)}:R>`;
 
-    const filesToSend = [];
-    const galleryItems = [];
-
-    for (const att of Evidencias) {
-      try {
-        const response = await fetch(att.proxyURL || att.url);
-        if (!response.ok) continue;
-
-        const buffer = Buffer.from(await response.arrayBuffer());
-        filesToSend.push(new AttachmentBuilder(buffer, { name: att.name }));
-
-        galleryItems.push(
-          new MediaGalleryItemBuilder()
-            .setDescription(`Evidencia subida por ${user.tag}`)
-            .setURL(`attachment://${att.name}`)
-        );
-      } catch {}
-    }
-
     const container = new ContainerBuilder()
-      .setAccentColor(0xff0000)
+      .setAccentColor(0xf1c40f)
       .addSectionComponents((section) =>
         section
           .addTextDisplayComponents((text) => text.setContent(textContent))
@@ -127,18 +112,17 @@ Estimado <@${user.id}>, un <@&${setup.RH}> revisará tu solicitud.
           )
       )
       .addSeparatorComponents((sep) => sep.setSpacing(SeparatorSpacingSize.Small).setDivider(true))
-      .addMediaGalleryComponents((gallery) => gallery.addItems(...galleryItems))
       .addSeparatorComponents((sep) => sep.setSpacing(SeparatorSpacingSize.Large).setDivider(true))
       .addActionRowComponents((row) =>
         row.addComponents(
           new ButtonBuilder()
-            .setCustomId('CloseDI')
+            .setCustomId('CloseVA')
             .setLabel('Cerrar')
             .setStyle(ButtonStyle.Danger)
             .setEmoji('🔐')
             .setDisabled(true),
           new ButtonBuilder()
-            .setCustomId('ClaimDI')
+            .setCustomId('ClaimVA')
             .setLabel('Reclamar')
             .setStyle(ButtonStyle.Primary)
             .setEmoji('✍🏻')
@@ -148,7 +132,7 @@ Estimado <@${user.id}>, un <@&${setup.RH}> revisará tu solicitud.
       .addActionRowComponents((row) =>
         row.addComponents(
           new UserSelectMenuBuilder()
-            .setCustomId('DITicketAddUser')
+            .setCustomId('VATicketAddUser')
             .setPlaceholder('👥 Agregar usuario al ticket')
             .setMinValues(1)
             .setMaxValues(10)
@@ -158,19 +142,18 @@ Estimado <@${user.id}>, un <@&${setup.RH}> revisará tu solicitud.
     await ticketChannel.send({
       flags: 'IsComponentsV2',
       components: [container],
-      files: filesToSend.length ? filesToSend : undefined,
     });
 
-    await TicketUserDI.create({
+    await TicketUserVA.create({
       GuildId: guild.id,
       ChannelId: ticketChannel.id,
       TicketId: ticketChannel.id,
       CreadorId: user.id,
-      Categoria: 'ReporteStaff',
+      Categoria: 'VIP',
     });
 
     await interaction.editReply({
-      content: `Tu ticket ha sido creado exitosamente: ${ticketChannel}`,
+      content: `Tu ticket VIP ha sido creado exitosamente: ${ticketChannel}`,
     });
   },
 };

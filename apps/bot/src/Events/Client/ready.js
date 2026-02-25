@@ -15,7 +15,6 @@ export default {
       client.user.setActivity(activity.name, { type: activity.type });
     }, 10_000);
 
-    // Client Backup - Global Access
     client.backupClient = await createBackupClient({
       storage: 'mongo',
       mongoUri: process.env.MONGO_URI,

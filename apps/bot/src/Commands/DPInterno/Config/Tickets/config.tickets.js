@@ -5,9 +5,11 @@ import {
   ActionRowBuilder,
 } from 'discord.js';
 import TicketSetupDI from '#database/models/DPInterno/TicketSetupDI.js';
+import { COMMAND_SCOPES } from '#config/guilds.js';
 
 export default {
   subCommand: 'config.tickets',
+  scope: COMMAND_SCOPES.MXRPDI,
 
   /**
    * @param {ChatInputCommandInteraction} interaction

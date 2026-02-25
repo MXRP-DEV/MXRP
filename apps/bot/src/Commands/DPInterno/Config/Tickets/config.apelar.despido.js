@@ -1,8 +1,10 @@
 import { ChatInputCommandInteraction, EmbedBuilder, PermissionFlagsBits } from 'discord.js';
 import ApelacionDespidoDI from '#database/models/DPInterno/ApelacionDespidoDI.js';
+import { COMMAND_SCOPES } from '#config/guilds.js';
 
 export default {
   subCommand: 'config.apelar.despidos',
+  scope: COMMAND_SCOPES.MXRPDI,
 
   /**
    * @param {ChatInputCommandInteraction} interaction
