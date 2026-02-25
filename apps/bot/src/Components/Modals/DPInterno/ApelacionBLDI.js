@@ -51,7 +51,7 @@ export default {
       content: 'Creando ticket...',
     });
 
-    const channelName = `🚫${user.username}`.toLowerCase().replace(/ /g, '-');
+    const channelName = `🚫┋${user.username}`.toLowerCase().replace(/ /g, '-');
 
     const ticketChannel = await guild.channels.create({
       name: channelName,
