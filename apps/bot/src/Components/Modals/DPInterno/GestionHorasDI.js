@@ -82,7 +82,7 @@ export default {
       ],
     });
 
-    const textContent = `⏰ **Gestión de Horas**
+    const textContent = `💼 **Gestión de Horas**
 
 Estimado <@${user.id}>, un <@&${setup.RH}> revisará tu solicitud.
 **Asunto:** ${Asunto}
