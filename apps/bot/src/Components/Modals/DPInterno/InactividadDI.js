@@ -81,7 +81,7 @@ export default {
       ],
     });
 
-    const textContent = `🏖️ **Solicitud de Inactividad**
+    const textContent = `⏱️ **Solicitud de Inactividad**
 
 Estimado <@${user.id}>, un <@&${setup.RH}> revisará tu solicitud.
 **Asunto:** ${Asunto}

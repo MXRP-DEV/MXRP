@@ -87,7 +87,7 @@ export default {
       ],
     });
 
-    const textContent = `⚖️ **Apelaciones - WIPs, Despidos, Applications**
+    const textContent = `🗒️ **Apelaciones - WIPs, Despidos, Applications**
 
 Estimado <@${user.id}>, un <@&${setup.RH}> revisará tu solicitud.
 **Asunto:** ${Asunto}

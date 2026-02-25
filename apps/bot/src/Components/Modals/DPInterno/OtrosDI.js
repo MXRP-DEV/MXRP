@@ -86,7 +86,7 @@ export default {
       ],
     });
 
-    const textContent = `📝 **Otros**
+    const textContent = `⚙️ **Otros**
 
 Estimado <@${user.id}>, un <@&${setup.RH}> revisará tu solicitud.
 **Asunto:** ${Asunto}

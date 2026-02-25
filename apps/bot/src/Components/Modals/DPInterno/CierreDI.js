@@ -5,6 +5,7 @@ import {
   ButtonBuilder,
   ButtonStyle,
   MediaGalleryItemBuilder,
+  EmbedBuilder,
 } from 'discord.js';
 import * as discordTranscripts from 'discord-html-transcripts-v2';
 import TicketSetupDI from '#database/models/DPInterno/TicketSetupDI.js';
@@ -48,7 +49,15 @@ export default {
     });
 
     await logChannel.send({
-      content: `🔒 Ticket cerrado por <@${user.id}>\nRazón: ${reason}`,
+      embeds: [
+        new EmbedBuilder()
+          .setTitle('Ticket Concluido')
+          .setThumbnail(client.user.displayAvatarURL())
+          .setColor('Random')
+          .setDescription(
+            `Ticket cerrado por <@${user.id}>\nRazón: ${reason} \nAtendido por: <@${ticket.StaffAsignado}>`
+          ),
+      ],
       files: [transcript],
     });
 

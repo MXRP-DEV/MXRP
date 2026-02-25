@@ -81,7 +81,7 @@ export default {
       ],
     });
 
-    const textContent = `📚 **Solicitud de Capacitación**
+    const textContent = `🗒️ **Solicitud de Capacitación**
 
 Estimado <@${user.id}>, un <@&${setup.RH}> revisará tu solicitud.
 **Asunto:** ${Asunto}
