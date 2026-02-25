@@ -8,11 +8,12 @@ import {
   ContainerBuilder,
   SeparatorSpacingSize,
 } from 'discord.js';
-import TicketSetupDI from '#database/models/DPInterno/TicketSetupDI.js';
-import TicketUserDI from '#database/models/DPInterno/TicketUserDI.js';
+import TicketSetupVA from '#database/models/DPVinculacion/TicketSetupVA.js';
+import TicketUserVA from '#database/models/DPVinculacion/TicketUserVA.js';
 
 export default {
-  customId: 'IngresoStaffDI',
+  customId: 'AclaracionesVA',
+
   /**
    * @param {ModalSubmitInteraction} interaction
    * @param {Client} client
@@ -25,7 +26,7 @@ export default {
 
     await interaction.deferReply({ flags: 'Ephemeral' });
 
-    const setup = await TicketSetupDI.findOne({ GuildId: guild.id });
+    const setup = await TicketSetupVA.findOne({ GuildId: guild.id });
 
     if (!setup) {
       return interaction.editReply({
@@ -33,11 +34,11 @@ export default {
       });
     }
 
-    const categoryId = setup.IngresoStaff;
+    const categoryId = setup.Aclaraciones;
 
     if (!categoryId) {
       return interaction.editReply({
-        content: 'No se encontró una categoría asignada para Ingreso a Staff.',
+        content: 'No se encontró una categoría asignada para Aclaraciones.',
       });
     }
 
@@ -45,13 +46,16 @@ export default {
       content: 'Creando ticket...',
     });
 
-    const channelName = `👔┋${user.username}`.toLowerCase().replace(/ /g, '-');
+    const channelName = `aclaracion-${user.username}`
+      .toLowerCase()
+      .replace(/ /g, '-')
+      .replace(/[^a-z0-9-]/g, '');
 
     const ticketChannel = await guild.channels.create({
       name: channelName,
       type: ChannelType.GuildText,
       parent: categoryId,
-      topic: `Ticket de ${user.tag} | Ingreso a Staff`,
+      topic: `Ticket de ${user.tag} | Aclaraciones`,
       permissionOverwrites: [
         { id: guild.id, deny: [PermissionsBitField.Flags.ViewChannel] },
         {
@@ -63,15 +67,7 @@ export default {
           ],
         },
         {
-          id: setup.RH,
-          allow: [
-            PermissionsBitField.Flags.ViewChannel,
-            PermissionsBitField.Flags.SendMessages,
-            PermissionsBitField.Flags.ReadMessageHistory,
-          ],
-        },
-        {
-          id: setup.AsuntosInternos,
+          id: setup.ClaimRole1,
           allow: [
             PermissionsBitField.Flags.ViewChannel,
             PermissionsBitField.Flags.SendMessages,
@@ -81,9 +77,15 @@ export default {
       ],
     });
 
-    const textContent = `👔 **Ingreso a Staff**
+    // Asignar rol de ticket abierto al usuario
+    if (setup.OpenTicketRole) {
+      const member = await guild.members.fetch(user.id);
+      await member.roles.add(setup.OpenTicketRole);
+    }
 
-Estimado <@${user.id}>, un <@&${setup.RH}> revisará tu solicitud.
+    const textContent = `📋 **Aclaraciones**
+
+Estimado <@${user.id}>, un <@&${setup.ClaimRole1}> revisará tu solicitud.
 **Asunto:** ${Asunto}
 **Detalles:** ${Detalles}
 
@@ -92,7 +94,7 @@ Estimado <@${user.id}>, un <@&${setup.RH}> revisará tu solicitud.
 • Creado: <t:${Math.floor(Date.now() / 1000)}:R>`;
 
     const container = new ContainerBuilder()
-      .setAccentColor(0x00ff99)
+      .setAccentColor(0x3498db)
       .addSectionComponents((section) =>
         section
           .addTextDisplayComponents((text) => text.setContent(textContent))
@@ -105,13 +107,13 @@ Estimado <@${user.id}>, un <@&${setup.RH}> revisará tu solicitud.
       .addActionRowComponents((row) =>
         row.addComponents(
           new ButtonBuilder()
-            .setCustomId('CloseDI')
+            .setCustomId('CloseVA')
             .setLabel('Cerrar')
             .setStyle(ButtonStyle.Danger)
             .setEmoji('🔐')
             .setDisabled(true),
           new ButtonBuilder()
-            .setCustomId('ClaimDI')
+            .setCustomId('ClaimVA')
             .setLabel('Reclamar')
             .setStyle(ButtonStyle.Primary)
             .setEmoji('✍🏻')
@@ -121,7 +123,7 @@ Estimado <@${user.id}>, un <@&${setup.RH}> revisará tu solicitud.
       .addActionRowComponents((row) =>
         row.addComponents(
           new UserSelectMenuBuilder()
-            .setCustomId('DITicketAddUser')
+            .setCustomId('VATicketAddUser')
             .setPlaceholder('👥 Agregar usuario al ticket')
             .setMinValues(1)
             .setMaxValues(10)
@@ -133,12 +135,17 @@ Estimado <@${user.id}>, un <@&${setup.RH}> revisará tu solicitud.
       components: [container],
     });
 
-    await TicketUserDI.create({
+    // Ping al rol correspondiente
+    await ticketChannel.send({
+      content: `<@&${setup.ClaimRole1}>`,
+    });
+
+    await TicketUserVA.create({
       GuildId: guild.id,
       ChannelId: ticketChannel.id,
       TicketId: ticketChannel.id,
       CreadorId: user.id,
-      Categoria: 'IngresoStaff',
+      Categoria: 'Aclaraciones',
     });
 
     await interaction.editReply({

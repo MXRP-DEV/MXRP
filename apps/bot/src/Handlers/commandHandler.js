@@ -83,28 +83,49 @@ async function loadCommand(client, file) {
 
 function handleSubCommand(client, command) {
   const parts = command.subCommand.split('.');
+  const scope = command.scope || 'GLOBAL';
 
   if (parts.length === 2) {
     const [commandName, subCommandName] = parts;
+
+    // Guardar bajo clave scopeada: scope.commandName
+    const scopedKey = `${scope}.${commandName}`;
+    if (!client.subCommands.has(scopedKey)) {
+      client.subCommands.set(scopedKey, new Map());
+    }
+    client.subCommands.get(scopedKey).set(subCommandName, command);
+
+    // También guardar bajo clave genérica para compatibilidad
     if (!client.subCommands.has(commandName)) {
       client.subCommands.set(commandName, new Map());
     }
     client.subCommands.get(commandName).set(subCommandName, command);
+
     return {
-      name: `${commandName}.${subCommandName}`,
+      name: `${scopedKey}.${subCommandName}`,
       subCommand: true,
       status: true,
     };
   } else if (parts.length === 3) {
     const [commandName, groupName, subCommandName] = parts;
+
+    // Guardar bajo clave scopeada
+    const scopedKey = `${scope}.${commandName}`;
+    if (!client.subCommands.has(scopedKey)) {
+      client.subCommands.set(scopedKey, new Map());
+    }
+    const commandMap = client.subCommands.get(scopedKey);
+    const fullKey = `${groupName}.${subCommandName}`;
+    commandMap.set(fullKey, command);
+
+    // También guardar bajo clave genérica
     if (!client.subCommands.has(commandName)) {
       client.subCommands.set(commandName, new Map());
     }
-    const commandMap = client.subCommands.get(commandName);
-    const fullKey = `${groupName}.${subCommandName}`;
-    commandMap.set(fullKey, command);
+    client.subCommands.get(commandName).set(fullKey, command);
+
     return {
-      name: `${commandName}.${groupName}.${subCommandName}`,
+      name: `${scopedKey}.${fullKey}`,
       subCommand: true,
       status: true,
     };

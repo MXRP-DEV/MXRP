@@ -2,17 +2,21 @@ import {
   ModalSubmitInteraction,
   ChannelType,
   PermissionsBitField,
+  AttachmentBuilder,
+  MediaGalleryItemBuilder,
   ButtonBuilder,
   ButtonStyle,
   UserSelectMenuBuilder,
   ContainerBuilder,
   SeparatorSpacingSize,
 } from 'discord.js';
-import TicketSetupDI from '#database/models/DPInterno/TicketSetupDI.js';
-import TicketUserDI from '#database/models/DPInterno/TicketUserDI.js';
+import fetch from 'node-fetch';
+import TicketSetupVA from '#database/models/DPVinculacion/TicketSetupVA.js';
+import TicketUserVA from '#database/models/DPVinculacion/TicketUserVA.js';
 
 export default {
-  customId: 'IngresoStaffDI',
+  customId: 'ReporteVA',
+
   /**
    * @param {ModalSubmitInteraction} interaction
    * @param {Client} client
@@ -23,9 +27,12 @@ export default {
     const Asunto = fields.getTextInputValue('Asunto');
     const Detalles = fields.getTextInputValue('Detalles');
 
+    const evidenciasAttachments = fields.fields.get('Evidencias')?.attachments ?? new Map();
+    const Evidencias = Array.from(evidenciasAttachments.values());
+
     await interaction.deferReply({ flags: 'Ephemeral' });
 
-    const setup = await TicketSetupDI.findOne({ GuildId: guild.id });
+    const setup = await TicketSetupVA.findOne({ GuildId: guild.id });
 
     if (!setup) {
       return interaction.editReply({
@@ -33,11 +40,11 @@ export default {
       });
     }
 
-    const categoryId = setup.IngresoStaff;
+    const categoryId = setup.ReportesVA;
 
     if (!categoryId) {
       return interaction.editReply({
-        content: 'No se encontró una categoría asignada para Ingreso a Staff.',
+        content: 'No se encontró una categoría asignada para Reportes VA.',
       });
     }
 
@@ -45,13 +52,16 @@ export default {
       content: 'Creando ticket...',
     });
 
-    const channelName = `👔┋${user.username}`.toLowerCase().replace(/ /g, '-');
+    const channelName = `reporte-va-${user.username}`
+      .toLowerCase()
+      .replace(/ /g, '-')
+      .replace(/[^a-z0-9-]/g, '');
 
     const ticketChannel = await guild.channels.create({
       name: channelName,
       type: ChannelType.GuildText,
       parent: categoryId,
-      topic: `Ticket de ${user.tag} | Ingreso a Staff`,
+      topic: `Ticket de ${user.tag} | Reporte Vinculación Administrativa`,
       permissionOverwrites: [
         { id: guild.id, deny: [PermissionsBitField.Flags.ViewChannel] },
         {
@@ -63,15 +73,7 @@ export default {
           ],
         },
         {
-          id: setup.RH,
-          allow: [
-            PermissionsBitField.Flags.ViewChannel,
-            PermissionsBitField.Flags.SendMessages,
-            PermissionsBitField.Flags.ReadMessageHistory,
-          ],
-        },
-        {
-          id: setup.AsuntosInternos,
+          id: setup.ClaimRole3,
           allow: [
             PermissionsBitField.Flags.ViewChannel,
             PermissionsBitField.Flags.SendMessages,
@@ -81,9 +83,15 @@ export default {
       ],
     });
 
-    const textContent = `👔 **Ingreso a Staff**
+    // Asignar rol de ticket abierto al usuario
+    if (setup.OpenTicketRole) {
+      const member = await guild.members.fetch(user.id);
+      await member.roles.add(setup.OpenTicketRole);
+    }
 
-Estimado <@${user.id}>, un <@&${setup.RH}> revisará tu solicitud.
+    const textContent = `🛡️ **Reporte Vinculación Administrativa**
+
+Estimado <@${user.id}>, un <@&${setup.ClaimRole3}> revisará tu solicitud.
 **Asunto:** ${Asunto}
 **Detalles:** ${Detalles}
 
@@ -91,8 +99,27 @@ Estimado <@${user.id}>, un <@&${setup.RH}> revisará tu solicitud.
 • Estado: Pendiente
 • Creado: <t:${Math.floor(Date.now() / 1000)}:R>`;
 
+    const filesToSend = [];
+    const galleryItems = [];
+
+    for (const att of Evidencias) {
+      try {
+        const response = await fetch(att.proxyURL || att.url);
+        if (!response.ok) continue;
+
+        const buffer = Buffer.from(await response.arrayBuffer());
+        filesToSend.push(new AttachmentBuilder(buffer, { name: att.name }));
+
+        galleryItems.push(
+          new MediaGalleryItemBuilder()
+            .setDescription(`Evidencia subida por ${user.tag}`)
+            .setURL(`attachment://${att.name}`)
+        );
+      } catch {}
+    }
+
     const container = new ContainerBuilder()
-      .setAccentColor(0x00ff99)
+      .setAccentColor(0x9b59b6)
       .addSectionComponents((section) =>
         section
           .addTextDisplayComponents((text) => text.setContent(textContent))
@@ -101,17 +128,18 @@ Estimado <@${user.id}>, un <@&${setup.RH}> revisará tu solicitud.
           )
       )
       .addSeparatorComponents((sep) => sep.setSpacing(SeparatorSpacingSize.Small).setDivider(true))
+      .addMediaGalleryComponents((gallery) => gallery.addItems(...galleryItems))
       .addSeparatorComponents((sep) => sep.setSpacing(SeparatorSpacingSize.Large).setDivider(true))
       .addActionRowComponents((row) =>
         row.addComponents(
           new ButtonBuilder()
-            .setCustomId('CloseDI')
+            .setCustomId('CloseVA')
             .setLabel('Cerrar')
             .setStyle(ButtonStyle.Danger)
             .setEmoji('🔐')
             .setDisabled(true),
           new ButtonBuilder()
-            .setCustomId('ClaimDI')
+            .setCustomId('ClaimVA')
             .setLabel('Reclamar')
             .setStyle(ButtonStyle.Primary)
             .setEmoji('✍🏻')
@@ -121,7 +149,7 @@ Estimado <@${user.id}>, un <@&${setup.RH}> revisará tu solicitud.
       .addActionRowComponents((row) =>
         row.addComponents(
           new UserSelectMenuBuilder()
-            .setCustomId('DITicketAddUser')
+            .setCustomId('VATicketAddUser')
             .setPlaceholder('👥 Agregar usuario al ticket')
             .setMinValues(1)
             .setMaxValues(10)
@@ -131,14 +159,20 @@ Estimado <@${user.id}>, un <@&${setup.RH}> revisará tu solicitud.
     await ticketChannel.send({
       flags: 'IsComponentsV2',
       components: [container],
+      files: filesToSend.length ? filesToSend : undefined,
     });
 
-    await TicketUserDI.create({
+    // Ping al rol correspondiente
+    await ticketChannel.send({
+      content: `<@&${setup.ClaimRole3}>`,
+    });
+
+    await TicketUserVA.create({
       GuildId: guild.id,
       ChannelId: ticketChannel.id,
       TicketId: ticketChannel.id,
       CreadorId: user.id,
-      Categoria: 'IngresoStaff',
+      Categoria: 'ReportesVA',
     });
 
     await interaction.editReply({

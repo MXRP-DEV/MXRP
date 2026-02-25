@@ -82,6 +82,22 @@ export function getGuildInfo(guildId) {
   return Object.values(GUILD_CONFIG).find((guild) => guild.id === guildId);
 }
 
+export function getScopeForGuild(guildId) {
+  const config = getGuildConfig();
+
+  // Buscar el scope que corresponde al guildId
+  for (const [scopeKey, scopeValue] of Object.entries(COMMAND_SCOPES)) {
+    if (scopeValue === 'global') continue;
+
+    const guildIds = getGuildIdsForScope(scopeValue);
+    if (guildIds && guildIds.includes(guildId)) {
+      return scopeValue;
+    }
+  }
+
+  return COMMAND_SCOPES.GLOBAL;
+}
+
 export function getEnabledGuilds() {
   return Object.entries(GUILD_CONFIG)
     .filter(([_, config]) => config.enabled)

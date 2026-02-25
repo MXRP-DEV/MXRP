@@ -1,5 +1,6 @@
 import { Events } from 'discord.js';
 import { logger } from '#functions/Logger.js';
+import { getScopeForGuild } from '#config/guilds.js';
 
 export default {
   name: Events.InteractionCreate,
@@ -18,7 +19,17 @@ export default {
           ? `${subCommandGroupName}.${subCommandName}`
           : subCommandName;
 
-        const subCommands = client.subCommands.get(interaction.commandName);
+        // Obtener scope del guild actual
+        const guildScope = interaction.guildId ? getScopeForGuild(interaction.guildId) : 'GLOBAL';
+
+        // Buscar primero en subcomandos scopeados: scope.commandName
+        const scopedKey = `${guildScope}.${interaction.commandName}`;
+        let subCommands = client.subCommands.get(scopedKey);
+
+        // Si no existe en scope específico, buscar en clave genérica
+        if (!subCommands) {
+          subCommands = client.subCommands.get(interaction.commandName);
+        }
 
         if (subCommands) {
           const subCommand = subCommands.get(subCommandKey);
@@ -33,9 +44,6 @@ export default {
           await command.execute(interaction, client);
         }
       } else {
-        if (command.execute) {
-          await command.execute(interaction, client);
-        }
         if (command.execute) {
           await command.execute(interaction, client);
         }

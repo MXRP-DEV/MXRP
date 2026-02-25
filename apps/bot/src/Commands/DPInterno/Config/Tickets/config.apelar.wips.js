@@ -1,8 +1,10 @@
 import { ChatInputCommandInteraction, EmbedBuilder, PermissionFlagsBits } from 'discord.js';
 import ApelacionWIPDI from '#database/models/DPInterno/ApelacionWIPDI.js';
+import { COMMAND_SCOPES } from '#config/guilds.js';
 
 export default {
   subCommand: 'config.apelar.wips',
+  scope: COMMAND_SCOPES.MXRPDI,
 
   /**
    * @param {ChatInputCommandInteraction} interaction
