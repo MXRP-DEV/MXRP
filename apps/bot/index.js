@@ -65,7 +65,6 @@ const client = new Client({
 
 await databaseManager.connect();
 
-// Inicializar sistema AntiCrash antes de cargar handlers
 setupAntiCrash(client);
 
 await LoadEvents(client);
