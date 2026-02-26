@@ -8,7 +8,7 @@ import {
   EmbedBuilder,
 } from 'discord.js';
 import * as discordTranscripts from 'discord-html-transcripts-v2';
-import TicketSetupDI from '#database/models/DPInterno/TicketSetupDI.js';
+import { CacheManager } from '#utils/CacheManager.js';
 import TicketUserDI from '#database/models/DPInterno/TicketUserDI.js';
 
 export default {
@@ -29,7 +29,7 @@ export default {
       return interaction.editReply({ content: 'Este ticket no es válido o ya fue cerrado.' });
     }
 
-    const setup = await TicketSetupDI.findOne({ GuildId: guild.id });
+    const setup = await CacheManager.getTicketSetupDI(guild.id);
     if (!setup?.RegistroId) {
       return interaction.editReply({ content: 'No hay canal de registros configurado.' });
     }

@@ -11,7 +11,7 @@ import {
   SeparatorSpacingSize,
 } from 'discord.js';
 import fetch from 'node-fetch';
-import TicketSetupVA from '#database/models/DPVinculacion/TicketSetupVA.js';
+import { CacheManager } from '#utils/CacheManager.js';
 import TicketUserVA from '#database/models/DPVinculacion/TicketUserVA.js';
 
 export default {
@@ -32,7 +32,7 @@ export default {
 
     await interaction.deferReply({ flags: 'Ephemeral' });
 
-    const setup = await TicketSetupVA.findOne({ GuildId: guild.id });
+    const setup = await CacheManager.getTicketSetupVA(guild.id);
 
     if (!setup) {
       return interaction.editReply({

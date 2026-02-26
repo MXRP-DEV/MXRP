@@ -10,32 +10,8 @@ export default {
    * @param {Client} client
    */
   async execute(interaction, client) {
-    const { values, member } = interaction;
+    const { values } = interaction;
     const SelectedOption = values[0];
-
-    // Validar roles VIP para tickets de soporte VIP
-    if (SelectedOption === 'vip') {
-      const setup = await TicketSetupVA.findOne({ GuildId: interaction.guild.id });
-
-      if (!setup) {
-        return interaction.reply({
-          content: 'El sistema de tickets no está configurado.',
-          flags: 'Ephemeral',
-        });
-      }
-
-      const hasVipRole = setup.VipRole && member.roles.cache.has(setup.VipRole);
-      const hasPartnerRole = setup.PartnerRole && member.roles.cache.has(setup.PartnerRole);
-      const hasInversorRole = setup.InversorRole && member.roles.cache.has(setup.InversorRole);
-
-      if (!hasVipRole && !hasPartnerRole && !hasInversorRole) {
-        return interaction.reply({
-          content:
-            'No tienes permiso para abrir tickets VIP. Este servicio es exclusivo para usuarios VIP, Partners o Inversores.',
-          flags: 'Ephemeral',
-        });
-      }
-    }
 
     const ModalMap = {
       apelar_ban: {

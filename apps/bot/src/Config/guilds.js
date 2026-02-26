@@ -14,6 +14,13 @@ function getGuildConfig() {
       enabled: true,
       color: '#4ECDC4',
     },
+    MXRPDR: {
+      id: process.env.GUILD_MXRPDR,
+      name: 'MXRP Departamento Rol',
+      description: 'Servidor de Departamento Rol',
+      enabled: true,
+      color: '#4ECDC4',
+    },
     MXRPVA: {
       id: process.env.GUILD_MXRPVA,
       name: 'MXRP Vinculación',
@@ -37,6 +44,7 @@ export const COMMAND_SCOPES = {
   GLOBAL: 'global',
   MXRP: 'MXRP',
   MXRPDI: 'MXRPDI',
+  MXRPDR: 'MXRPDR',
   MXRPVA: 'MXRPVA',
   DEV: 'DEV',
   MXRP_NETWORK: 'mxrp_network',
@@ -47,9 +55,10 @@ export const SCOPE_TO_GUILDS = {
   [COMMAND_SCOPES.GLOBAL]: null,
   [COMMAND_SCOPES.MXRP]: ['MXRP'],
   [COMMAND_SCOPES.MXRPDI]: ['MXRPDI'],
+  [COMMAND_SCOPES.MXRPDR]: ['MXRPDR'],
   [COMMAND_SCOPES.MXRPVA]: ['MXRPVA'],
   [COMMAND_SCOPES.DEV]: ['DEV'],
-  [COMMAND_SCOPES.MXRP_NETWORK]: ['MXRP', 'MXRPDI', 'MXRPVA'],
+  [COMMAND_SCOPES.MXRP_NETWORK]: ['MXRP', 'MXRPDI', 'MXRPVA', 'MXRPDR'],
   [COMMAND_SCOPES.ADMIN_ONLY]: ['MXRP', 'MXRPDI'],
 };
 
@@ -85,7 +94,6 @@ export function getGuildInfo(guildId) {
 export function getScopeForGuild(guildId) {
   const config = getGuildConfig();
 
-  // Buscar el scope que corresponde al guildId
   for (const [scopeKey, scopeValue] of Object.entries(COMMAND_SCOPES)) {
     if (scopeValue === 'global') continue;
 

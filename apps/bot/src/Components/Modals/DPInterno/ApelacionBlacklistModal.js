@@ -6,7 +6,7 @@ import {
   SeparatorSpacingSize,
 } from 'discord.js';
 import fetch from 'node-fetch';
-import ApelacionBlacklistDI from '#database/models/DPInterno/ApelacionBlacklistDI.js';
+import { CacheManager } from '#utils/CacheManager.js';
 
 export default {
   customId: 'apelar-blacklist',
@@ -26,7 +26,7 @@ export default {
 
     await interaction.deferReply({ flags: 'Ephemeral' });
 
-    const config = await ApelacionBlacklistDI.findOne({ GuildId: guild.id });
+    const config = await CacheManager.getApelacionBlacklist(guild.id);
 
     if (!config) {
       return interaction.editReply({
@@ -63,9 +63,18 @@ ${Motivo}
 
     const filesToSend = [];
     const galleryItems = [];
+    const skippedFiles = [];
+    const MAX_VIDEO_SIZE = 10 * 1024 * 1024;
 
     for (const att of Pruebas) {
       try {
+        const isVideo =
+          att.name?.toLowerCase().endsWith('.mp4') || att.contentType?.startsWith('video/');
+        if (isVideo && att.size > MAX_VIDEO_SIZE) {
+          skippedFiles.push(`${att.name} (${(att.size / 1024 / 1024).toFixed(2)}MB - máx 10MB)`);
+          continue;
+        }
+
         const response = await fetch(att.proxyURL || att.url);
         if (!response.ok) continue;
 
@@ -78,6 +87,13 @@ ${Motivo}
             .setURL(`attachment://${att.name}`)
         );
       } catch {}
+    }
+
+    if (skippedFiles.length > 0) {
+      await interaction.followUp({
+        content: `⚠️ Los siguientes videos exceden el límite de 10MB y no fueron adjuntados:\n${skippedFiles.join('\n')}`,
+        flags: 'Ephemeral',
+      });
     }
 
     const container = new ContainerBuilder()

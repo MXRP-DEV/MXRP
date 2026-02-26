@@ -5,6 +5,7 @@ import { LoadEvents } from '#handlers/eventHandler.js';
 import { LoadCommands } from '#handlers/commandHandler.js';
 import { LoadComponents } from '#handlers/ComponentHandler.js';
 import { databaseManager } from '#database/connection.js';
+import { redisManager } from '#utils/RedisClient.js';
 import { setupAntiCrash } from '#handlers/antiCrash.js';
 
 const client = new Client({
@@ -64,6 +65,7 @@ const client = new Client({
 });
 
 await databaseManager.connect();
+await redisManager.connect();
 
 setupAntiCrash(client);
 

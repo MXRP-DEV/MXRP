@@ -7,7 +7,7 @@ import {
   MediaGalleryItemBuilder,
 } from 'discord.js';
 import * as discordTranscripts from 'discord-html-transcripts-v2';
-import TicketSetupVA from '#database/models/DPVinculacion/TicketSetupVA.js';
+import { CacheManager } from '#utils/CacheManager.js';
 import TicketUserVA from '#database/models/DPVinculacion/TicketUserVA.js';
 
 export default {
@@ -28,7 +28,7 @@ export default {
       return interaction.editReply({ content: 'Este ticket no es válido o ya fue cerrado.' });
     }
 
-    const setup = await TicketSetupVA.findOne({ GuildId: guild.id });
+    const setup = await CacheManager.getTicketSetupVA(guild.id);
     if (!setup?.LogsId) {
       return interaction.editReply({ content: 'No hay canal de logs configurado.' });
     }

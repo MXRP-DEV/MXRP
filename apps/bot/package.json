@@ -31,7 +31,8 @@
     "dotenv": "^17.3.1",
     "erlc-api": "^3.3.1",
     "mongoose": "^9.2.1",
-    "node-fetch": "^3.3.2"
+    "node-fetch": "^3.3.2",
+    "redis": "^5.11.0"
   },
   "devDependencies": {
     "eslint": "^10.0.1",

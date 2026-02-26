@@ -1,9 +1,4 @@
-import {
-  SlashCommandBuilder,
-  PermissionFlagsBits,
-  ApplicationIntegrationType,
-  ChannelType,
-} from 'discord.js';
+import { SlashCommandBuilder, PermissionFlagsBits, ApplicationIntegrationType } from 'discord.js';
 import { COMMAND_SCOPES } from '#config/guilds.js';
 
 export default {

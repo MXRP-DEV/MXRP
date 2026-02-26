@@ -8,7 +8,7 @@ import {
   ContainerBuilder,
   SeparatorSpacingSize,
 } from 'discord.js';
-import TicketSetupDI from '#database/models/DPInterno/TicketSetupDI.js';
+import { CacheManager } from '#utils/CacheManager.js';
 import TicketUserDI from '#database/models/DPInterno/TicketUserDI.js';
 
 export default {
@@ -25,7 +25,7 @@ export default {
 
     await interaction.deferReply({ flags: 'Ephemeral' });
 
-    const setup = await TicketSetupDI.findOne({ GuildId: guild.id });
+    const setup = await CacheManager.getTicketSetupDI(guild.id);
 
     if (!setup) {
       return interaction.editReply({

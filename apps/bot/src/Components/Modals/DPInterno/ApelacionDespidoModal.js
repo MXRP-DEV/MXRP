@@ -1,5 +1,5 @@
 import { ModalSubmitInteraction, ContainerBuilder, SeparatorSpacingSize } from 'discord.js';
-import ApelacionDespidoDI from '#database/models/DPInterno/ApelacionDespidoDI.js';
+import { CacheManager } from '#utils/CacheManager.js';
 
 export default {
   customId: 'apelar-despido',
@@ -20,7 +20,7 @@ export default {
 
     await interaction.deferReply({ flags: 'Ephemeral' });
 
-    const config = await ApelacionDespidoDI.findOne({ GuildId: guild.id });
+    const config = await CacheManager.getApelacionDespido(guild.id);
 
     if (!config) {
       return interaction.editReply({
