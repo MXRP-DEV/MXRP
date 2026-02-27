@@ -1,4 +1,4 @@
-import {
+﻿import {
   ModalSubmitInteraction,
   ChannelType,
   ContainerBuilder,
@@ -24,9 +24,14 @@ export default {
     const { guild, user, channel, message } = interaction;
     const reason = interaction.fields.getTextInputValue('Razon');
 
-    const ticket = await TicketUserDI.findOne({ TicketId: channel.id });
+    const ticket = await TicketUserDI.findOne({ ChannelId: channel.id });
     if (!ticket || ticket.Estado === 'cerrado') {
       return interaction.editReply({ content: 'Este ticket no es válido o ya fue cerrado.' });
+    }
+    if (!ticket.StaffAsignado) {
+      return interaction.editReply({
+        content: 'No se puede cerrar un ticket sin reclamar primero.',
+      });
     }
 
     const setup = await CacheManager.getTicketSetupDI(guild.id);
@@ -89,7 +94,7 @@ export default {
       .addSectionComponents((section) =>
         section
           .addTextDisplayComponents((text) =>
-            text.setContent(`${textContent}\n\n🔒 **Ticket cerrado**\n**Razón:** ${reason}`)
+            text.setContent(`${textContent}\n\n🔐 **Ticket cerrado**\n**Razón:** ${reason}`)
           )
           .setThumbnailAccessory((thumb) =>
             thumb.setURL(client.user.displayAvatarURL({ size: 1024, extension: 'png' }))
@@ -122,7 +127,7 @@ export default {
     await message.edit({ components: [closedContainer] });
 
     await interaction.editReply({
-      content: 'El ticket se cerrará en 5 segundos.',
+      content: 'El ticket se cerrara en 5 segundos.',
     });
 
     setTimeout(() => {

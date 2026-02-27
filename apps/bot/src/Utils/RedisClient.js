@@ -5,6 +5,7 @@ class RedisManager {
   constructor() {
     this.client = null;
     this.isConnected = false;
+    this.inFlight = new Map();
   }
 
   async connect() {
@@ -19,7 +20,11 @@ class RedisManager {
         return;
       }
 
-      const redisUrl = `redis://${username}:${password}@${url}:${port}`;
+      const encodedPassword = encodeURIComponent(password);
+      const auth = username
+        ? `${encodeURIComponent(username)}:${encodedPassword}@`
+        : `:${encodedPassword}@`;
+      const redisUrl = `redis://${auth}${url}:${port}`;
 
       this.client = createClient({
         url: redisUrl,
@@ -121,11 +126,24 @@ class RedisManager {
       return cached;
     }
 
-    const value = await fetchFn();
-    if (value !== null && value !== undefined) {
-      await this.set(key, value, ttlSeconds);
+    if (this.inFlight.has(key)) {
+      return this.inFlight.get(key);
     }
-    return value;
+
+    const fetchPromise = (async () => {
+      const value = await fetchFn();
+      if (value !== null && value !== undefined) {
+        await this.set(key, value, ttlSeconds);
+      }
+      return value;
+    })();
+
+    this.inFlight.set(key, fetchPromise);
+    try {
+      return await fetchPromise;
+    } finally {
+      this.inFlight.delete(key);
+    }
   }
 
   getStatus() {

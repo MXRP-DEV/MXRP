@@ -1,6 +1,7 @@
 import { ChatInputCommandInteraction, EmbedBuilder } from 'discord.js';
 import InformeSetupVA from '#database/models/DPVinculacion/InformeSetupVA.js';
 import { COMMAND_SCOPES } from '#config/guilds.js';
+import { CacheManager } from '#utils/CacheManager.js';
 
 export default {
   subCommand: 'config.informes.gp1',
@@ -30,6 +31,7 @@ export default {
       Data.GP1Role = RolId;
       await Data.save();
     }
+    await CacheManager.invalidateInformeSetupVA(guild.id);
 
     await interaction.editReply({
       embeds: [

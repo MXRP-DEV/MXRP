@@ -1,6 +1,7 @@
 import { ChatInputCommandInteraction, EmbedBuilder, PermissionFlagsBits } from 'discord.js';
 import ApelacionDespidoDI from '#database/models/DPInterno/ApelacionDespidoDI.js';
 import { COMMAND_SCOPES } from '#config/guilds.js';
+import { CacheManager } from '#utils/CacheManager.js';
 
 export default {
   subCommand: 'config.apelar.despidos',
@@ -33,6 +34,7 @@ export default {
       Data.RHRolId = RHRolId;
       await Data.save();
     }
+    await CacheManager.invalidateApelacionDespido(guild.id);
 
     const ConfigEmbed = new EmbedBuilder()
       .setTitle('⚖️ Sistema de Apelaciones de Despidos - Configurado')
