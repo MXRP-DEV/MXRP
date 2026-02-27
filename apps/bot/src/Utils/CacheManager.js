@@ -112,6 +112,23 @@ export class CacheManager {
     await redisManager.del(cacheKey);
   }
 
+  static async getTicketSetupDR(guildId) {
+    const cacheKey = `ticket_setup_dr:${guildId}`;
+    return redisManager.getOrSet(
+      cacheKey,
+      async () => {
+        const TicketSetupDR = (await import('#database/models/DPRole/TicketSetupDR.js')).default;
+        return await TicketSetupDR.findOne({ GuildId: guildId }).lean();
+      },
+      DEFAULT_TTL
+    );
+  }
+
+  static async invalidateTicketSetupDR(guildId) {
+    const cacheKey = `ticket_setup_dr:${guildId}`;
+    await redisManager.del(cacheKey);
+  }
+
   static async clearAll() {
     if (!redisManager.isConnected) return false;
     try {
