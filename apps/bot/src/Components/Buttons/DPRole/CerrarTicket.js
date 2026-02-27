@@ -1,55 +1,54 @@
-import { ButtonInteraction } from 'discord.js';
-import { ModalBuilder, TextInputBuilder, TextInputStyle, ActionRowBuilder } from 'discord.js';
-import { CacheManager } from '#utils/CacheManager.js';
+import {
+  ButtonInteraction,
+  ModalBuilder,
+  TextInputBuilder,
+  TextInputStyle,
+  LabelBuilder,
+} from 'discord.js';
+import TicketUserDR from '#database/models/DPRole/TicketUserDR.js';
 
 export default {
-  customId: 'cerrar_ticket_dr',
+  customId: 'CloseDR',
 
   /**
    * @param {ButtonInteraction} interaction
    * @param {Client} client
    */
   async execute(interaction, client) {
-    const { guild, channel, member } = interaction;
+    const { channel } = interaction;
+    const ticket = await TicketUserDR.findOne({ ChannelId: channel.id });
 
-    // Verificar permisos (solo staff puede cerrar)
-    const setup = await CacheManager.getTicketSetupDR(guild.id);
-    
-    if (!setup) {
+    if (!ticket || ticket.Estado !== 'abierto') {
       return interaction.reply({
-        content: '❌ Sistema no configurado.',
+        content: 'Este ticket no es valido o ya fue cerrado.',
         flags: 'Ephemeral',
       });
     }
 
-    const hasPermission = 
-      member.roles.cache.has(setup.SpInterno) ||
-      member.roles.cache.has(setup.Supervisor) ||
-      member.roles.cache.has(setup.SupGeneral) ||
-      member.permissions.has('Administrator');
-
-    if (!hasPermission) {
+    if (!ticket.StaffAsignado) {
       return interaction.reply({
-        content: '❌ No tienes permisos para cerrar este ticket.',
+        content: 'No se puede cerrar un ticket sin reclamar primero.',
         flags: 'Ephemeral',
       });
     }
 
-    // Mostrar modal para razón de cierre
-    const modal = new ModalBuilder()
+    const Modal = new ModalBuilder()
       .setCustomId('CierreTicketDR')
-      .setTitle('Cerrar Ticket - DR')
-      .addComponents(
-        new ActionRowBuilder().addComponents(
-          new TextInputBuilder()
-            .setCustomId('Razon')
-            .setLabel('Razón del cierre')
-            .setPlaceholder('Describe por qué cierras este ticket...')
-            .setStyle(TextInputStyle.Paragraph)
-            .setRequired(true)
-        )
+      .setTitle('Cierre de Ticket')
+      .addLabelComponents(
+        new LabelBuilder()
+          .setLabel('Razon del cierre')
+          .setTextInputComponent(
+            new TextInputBuilder()
+              .setCustomId('Razon')
+              .setPlaceholder('Ingresa la razon del cierre')
+              .setStyle(TextInputStyle.Paragraph)
+              .setRequired(true)
+              .setMinLength(10)
+              .setMaxLength(500)
+          )
       );
 
-    await interaction.showModal(modal);
+    await interaction.showModal(Modal);
   },
 };

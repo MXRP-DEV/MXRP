@@ -109,12 +109,14 @@ ${consulta}
       .addActionRowComponents((row) =>
         row.addComponents(
           new ButtonBuilder()
-            .setCustomId('cerrar_ticket_dr')
-            .setLabel('🔒 Cerrar Ticket')
+            .setCustomId('CloseDR')
+            .setLabel('Cerrar Ticket')
+            .setEmoji('🔐')
             .setStyle(ButtonStyle.Danger),
           new ButtonBuilder()
-            .setCustomId('reclamar_ticket_dr')
-            .setLabel('✅ Reclamar Ticket')
+            .setCustomId('ClaimDR')
+            .setLabel('Reclamar Ticket')
+            .setEmoji('✍🏻')
             .setStyle(ButtonStyle.Success)
         )
       )

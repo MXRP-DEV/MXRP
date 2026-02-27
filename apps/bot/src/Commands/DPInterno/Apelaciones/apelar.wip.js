@@ -7,7 +7,7 @@ import {
   TextInputStyle,
   FileUploadBuilder,
 } from 'discord.js';
-import ApelacionWIPDI from '#database/models/DPInterno/ApelacionWIPDI.js';
+import { CacheManager } from '#utils/CacheManager.js';
 
 export default {
   subCommand: 'apelar.wip',
@@ -18,7 +18,7 @@ export default {
   async execute(interaction, client) {
     const { guild, member } = interaction;
 
-    const config = await ApelacionWIPDI.findOne({ GuildId: guild.id });
+    const config = await CacheManager.getApelacionWIP(guild.id);
 
     if (!config) {
       return interaction.reply({

@@ -1,6 +1,7 @@
 import { ChatInputCommandInteraction, EmbedBuilder, PermissionFlagsBits } from 'discord.js';
 import ApelacionWIPDI from '#database/models/DPInterno/ApelacionWIPDI.js';
 import { COMMAND_SCOPES } from '#config/guilds.js';
+import { CacheManager } from '#utils/CacheManager.js';
 
 export default {
   subCommand: 'config.apelar.wips',
@@ -29,6 +30,7 @@ export default {
       Data.PermisoRoleId = PermisoRoleId;
       await Data.save();
     }
+    await CacheManager.invalidateApelacionWIP(guild.id);
 
     const ConfigEmbed = new EmbedBuilder()
       .setTitle('📋 Sistema de Apelaciones WIPs - Configurado')

@@ -18,4 +18,4 @@ const TicketSetupDR = new Schema({
   SupGeneral: { type: String, required: true },
 });
 
-export default model('DRole', TicketSetupDR);
+export default model('TicketSetupDR', TicketSetupDR);

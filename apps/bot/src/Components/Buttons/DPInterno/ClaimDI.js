@@ -1,7 +1,7 @@
 import { ButtonInteraction, ButtonBuilder, ButtonStyle, MediaGalleryItemBuilder } from 'discord.js';
 import TicketUserDI from '#database/models/DPInterno/TicketUserDI.js';
-import TicketSetupDI from '#database/models/DPInterno/TicketSetupDI.js';
 import { buildTicketContainer } from '#utils/buildTicketContainer.js';
+import { CacheManager } from '#utils/CacheManager.js';
 
 export default {
   customId: 'ClaimDI',
@@ -14,7 +14,7 @@ export default {
 
     const { guild, member, user, channel, message } = interaction;
 
-    const setup = await TicketSetupDI.findOne({ GuildId: guild.id });
+    const setup = await CacheManager.getTicketSetupDI(guild.id);
     if (!setup) {
       return interaction.editReply({ content: 'Configuración no encontrada.' });
     }

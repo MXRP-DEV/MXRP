@@ -1,87 +1,110 @@
-import { ButtonInteraction } from 'discord.js';
-import { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } from 'discord.js';
-import { CacheManager } from '#utils/CacheManager.js';
+import {
+  ButtonInteraction,
+  ButtonBuilder,
+  ButtonStyle,
+  MediaGalleryItemBuilder,
+  ContainerBuilder,
+  SeparatorSpacingSize,
+  UserSelectMenuBuilder,
+} from 'discord.js';
 import TicketUserDR from '#database/models/DPRole/TicketUserDR.js';
+import { CacheManager } from '#utils/CacheManager.js';
 
 export default {
-  customId: 'reclamar_ticket_dr',
+  customId: 'ClaimDR',
 
   /**
    * @param {ButtonInteraction} interaction
    * @param {Client} client
    */
   async execute(interaction, client) {
-    const { guild, channel, member, message } = interaction;
+    await interaction.deferReply({ flags: 'Ephemeral' });
 
-    // Verificar permisos (solo staff puede reclamar)
+    const { guild, member, user, channel, message } = interaction;
+
     const setup = await CacheManager.getTicketSetupDR(guild.id);
-
     if (!setup) {
-      return interaction.reply({
-        content: '❌ Sistema no configurado.',
-        flags: 'Ephemeral',
-      });
+      return interaction.editReply({ content: 'Configuracion no encontrada.' });
     }
 
     const hasPermission =
       member.roles.cache.has(setup.SpInterno) ||
       member.roles.cache.has(setup.Supervisor) ||
-      member.roles.cache.has(setup.SupGeneral) ||
-      member.permissions.has('Administrator');
+      member.roles.cache.has(setup.SupGeneral);
 
     if (!hasPermission) {
-      return interaction.reply({
-        content: '❌ No tienes permisos para reclamar este ticket.',
-        flags: 'Ephemeral',
+      return interaction.editReply({ content: 'No tienes permisos para reclamar tickets.' });
+    }
+
+    const ticket = await TicketUserDR.findOne({ ChannelId: channel.id });
+    if (!ticket || ticket.Estado !== 'abierto' || ticket.StaffAsignado) {
+      return interaction.editReply({
+        content: 'Este ticket ya fue reclamado o cerrado.',
       });
     }
 
-    // Verificar si ya está reclamado
-    if (message.embeds[0]?.description?.includes('✅ **Reclamado por:**')) {
-      return interaction.reply({
-        content: '❌ Este ticket ya está reclamado.',
-        flags: 'Ephemeral',
+    ticket.StaffAsignado = user.id;
+    await ticket.save();
+
+    const originalContainer = message.components[0];
+
+    const sectionComponent = originalContainer.components.find((c) => c.type === 9);
+    const textContent = sectionComponent?.components[0]?.content || '';
+
+    const galleryComponent = originalContainer.components.find((c) => c.type === 12);
+    const galleryItemBuilders = [];
+    if (galleryComponent?.items?.length) {
+      galleryComponent.items.forEach((item) => {
+        galleryItemBuilders.push(
+          new MediaGalleryItemBuilder()
+            .setDescription(item.description || '')
+            .setURL(item.media.url)
+            .setSpoiler(item.spoiler || false)
+        );
       });
     }
 
-    // Actualizar embed para mostrar que está reclamado
-    const originalEmbed = message.embeds[0];
-    const updatedEmbed = EmbedBuilder.from(originalEmbed)
-      .setDescription(originalEmbed.description + '\n\n✅ **Reclamado por:** ' + member.user.tag)
-      .setColor('#00FF00');
-
-    // Deshabilitar botón de reclamar
-    const disabledRow = new ActionRowBuilder().addComponents(
+    const buttons = [
+      new ButtonBuilder().setCustomId('CloseDR').setLabel('Cerrar').setStyle(ButtonStyle.Danger),
       new ButtonBuilder()
-        .setCustomId('cerrar_ticket_dr')
-        .setLabel('🔒 Cerrar Ticket')
-        .setStyle(ButtonStyle.Danger),
-      new ButtonBuilder()
-        .setCustomId('reclamar_ticket_dr')
-        .setLabel('✅ Ticket Reclamado')
-        .setStyle(ButtonStyle.Success)
+        .setCustomId('ClaimDR')
+        .setLabel('Reclamar')
+        .setStyle(ButtonStyle.Primary)
         .setDisabled(true),
-      new ButtonBuilder()
-        .setCustomId('agregar_usuario_dr')
-        .setLabel('👥 Agregar Usuario')
-        .setStyle(ButtonStyle.Secondary)
-    );
+    ];
 
-    await message.edit({
-      embeds: [updatedEmbed],
-      components: [disabledRow],
-    });
+    const container = new ContainerBuilder()
+      .setAccentColor(0x00ff00)
+      .addSectionComponents((section) =>
+        section
+          .addTextDisplayComponents((text) => text.setContent(textContent))
+          .setThumbnailAccessory((thumb) =>
+            thumb.setURL(client.user.displayAvatarURL({ size: 1024, extension: 'png' }))
+          )
+      )
+      .addSeparatorComponents((sep) => sep.setSpacing(SeparatorSpacingSize.Small).setDivider(true));
 
-    await interaction.reply({
-      content: `✅ Ticket reclamado por ${member.user.tag}`,
-    });
+    if (galleryItemBuilders.length) {
+      container.addMediaGalleryComponents((gallery) => gallery.addItems(...galleryItemBuilders));
+    }
 
-    // Actualizar ticket en la base de datos
-    await TicketUserDR.updateOne({ ChannelId: channel.id }, { StaffAsignado: member.id });
+    container
+      .addSeparatorComponents((sep) => sep.setSpacing(SeparatorSpacingSize.Large).setDivider(true))
+      .addActionRowComponents((row) => row.addComponents(...buttons))
+      .addActionRowComponents((row) =>
+        row.addComponents(
+          new UserSelectMenuBuilder()
+            .setCustomId('DRTicketAddUser')
+            .setPlaceholder('Agregar usuario al ticket')
+            .setMinValues(1)
+            .setMaxValues(10)
+        )
+      );
 
-    // Enviar notificación al canal
-    await channel.send({
-      content: `🎯 **Ticket reclamado** por ${member}`,
+    await message.edit({ components: [container] });
+
+    await interaction.editReply({
+      content: 'Has reclamado este ticket.',
     });
   },
 };

@@ -6,6 +6,7 @@ import {
 } from 'discord.js';
 import TicketSetupDI from '#database/models/DPInterno/TicketSetupDI.js';
 import { COMMAND_SCOPES } from '#config/guilds.js';
+import { CacheManager } from '#utils/CacheManager.js';
 
 export default {
   subCommand: 'config.tickets',
@@ -70,6 +71,7 @@ export default {
       Data.AsuntosInternos = AsuntosInternos;
       await Data.save();
     }
+    await CacheManager.invalidateTicketSetupDI(guild.id);
 
     const PanelEmbed = new EmbedBuilder()
       .setTitle('📂 Panel D.I | Soporte')

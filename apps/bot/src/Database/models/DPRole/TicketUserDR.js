@@ -21,4 +21,4 @@ const TicketUserDR = new Schema(
   { timestamps: true }
 );
 
-export default model('TicketsDR', TicketUserDR);
+export default model('TicketUserDR', TicketUserDR);

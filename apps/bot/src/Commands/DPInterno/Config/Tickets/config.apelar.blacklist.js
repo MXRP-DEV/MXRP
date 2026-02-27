@@ -1,6 +1,7 @@
 import { ChatInputCommandInteraction, EmbedBuilder, PermissionFlagsBits } from 'discord.js';
 import ApelacionBlacklistDI from '#database/models/DPInterno/ApelacionBlacklistDI.js';
 import { COMMAND_SCOPES } from '#config/guilds.js';
+import { CacheManager } from '#utils/CacheManager.js';
 
 export default {
   subCommand: 'config.apelar.blacklist',
@@ -32,6 +33,7 @@ export default {
       Data.AsuntosRoleId = AsuntosRoleId;
       await Data.save();
     }
+    await CacheManager.invalidateApelacionBlacklist(guild.id);
 
     const ConfigEmbed = new EmbedBuilder()
       .setTitle('🚫 Sistema de Apelaciones Blacklist - Configurado')

@@ -62,7 +62,6 @@ export default {
       content: '✅ Ticket cerrado correctamente.',
     });
 
-    // Actualizar ticket en la base de datos
     await TicketUserDR.updateOne(
       { ChannelId: channel.id },
       {
@@ -71,7 +70,6 @@ export default {
       }
     );
 
-    // Eliminar canal después de 5 segundos
     setTimeout(() => {
       channel.delete('Ticket cerrado').catch(console.error);
     }, 5000);

@@ -8,6 +8,7 @@ import {
 import TicketSetupDR from '#database/models/DPRole/TicketSetupDR.js';
 import { COMMAND_SCOPES } from '#config/guilds.js';
 import { Assets } from '#utils/Assets/Assets.js';
+import { CacheManager } from '#utils/CacheManager.js';
 export default {
   subCommand: 'config.tickets',
   scope: COMMAND_SCOPES.MXRPDR,
@@ -59,6 +60,7 @@ export default {
       Data.SupGeneral = SupGeneral;
       await Data.save();
     }
+    await CacheManager.invalidateTicketSetupDR(guild.id);
 
     const Attachment = new AttachmentBuilder(Assets.BANNERMXRP, { name: 'banner.png' });
 

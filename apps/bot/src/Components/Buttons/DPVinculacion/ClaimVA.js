@@ -1,7 +1,7 @@
 import { ButtonInteraction, ButtonBuilder, ButtonStyle, MediaGalleryItemBuilder } from 'discord.js';
 import TicketUserVA from '#database/models/DPVinculacion/TicketUserVA.js';
-import TicketSetupVA from '#database/models/DPVinculacion/TicketSetupVA.js';
 import { buildTicketContainer } from '#utils/buildTicketContainer.js';
+import { CacheManager } from '#utils/CacheManager.js';
 
 export default {
   customId: 'ClaimVA',
@@ -14,7 +14,7 @@ export default {
 
     const { guild, member, user, channel, message } = interaction;
 
-    const setup = await TicketSetupVA.findOne({ GuildId: guild.id });
+    const setup = await CacheManager.getTicketSetupVA(guild.id);
     if (!setup) {
       return interaction.editReply({ content: 'Configuración no encontrada.' });
     }

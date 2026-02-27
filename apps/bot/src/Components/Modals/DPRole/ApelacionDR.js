@@ -138,11 +138,11 @@ ${pregunta}
       .addActionRowComponents((row) =>
         row.addComponents(
           new ButtonBuilder()
-            .setCustomId('cerrar_ticket_dr')
+            .setCustomId('CloseDR')
             .setLabel('🔒 Cerrar Ticket')
             .setStyle(ButtonStyle.Danger),
           new ButtonBuilder()
-            .setCustomId('reclamar_ticket_dr')
+            .setCustomId('ClaimDR')
             .setLabel('✅ Reclamar Ticket')
             .setStyle(ButtonStyle.Success)
         )

@@ -7,7 +7,7 @@ import {
   TextInputStyle,
   FileUploadBuilder,
 } from 'discord.js';
-import ApelacionBlacklistDI from '#database/models/DPInterno/ApelacionBlacklistDI.js';
+import { CacheManager } from '#utils/CacheManager.js';
 
 export default {
   subCommand: 'apelar.blacklist',
@@ -18,7 +18,7 @@ export default {
   async execute(interaction, client) {
     const { guild, member } = interaction;
 
-    const config = await ApelacionBlacklistDI.findOne({ GuildId: guild.id });
+    const config = await CacheManager.getApelacionBlacklist(guild.id);
 
     if (!config) {
       return interaction.reply({

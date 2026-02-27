@@ -1,5 +1,5 @@
 import { PermissionFlagsBits, UserSelectMenuInteraction } from 'discord.js';
-import TicketSetupVA from '#database/models/DPVinculacion/TicketSetupVA.js';
+import { CacheManager } from '#utils/CacheManager.js';
 
 export default {
   customId: 'VATicketAddUser',
@@ -13,7 +13,7 @@ export default {
 
     await interaction.deferReply({ flags: 'Ephemeral' });
 
-    const ticketSetup = await TicketSetupVA.findOne({ GuildId: guild.id });
+    const ticketSetup = await CacheManager.getTicketSetupVA(guild.id);
 
     if (!ticketSetup) {
       return interaction.editReply({

@@ -1,5 +1,5 @@
 import { PermissionFlagsBits, UserSelectMenuInteraction } from 'discord.js';
-import TicketSetupDI from '#database/models/DPInterno/TicketSetupDI.js';
+import { CacheManager } from '#utils/CacheManager.js';
 
 export default {
   customId: 'DITicketAddUser',
@@ -13,7 +13,7 @@ export default {
 
     await interaction.deferReply({ flags: 'Ephemeral' });
 
-    const ticketSetup = await TicketSetupDI.findOne({ GuildId: guild.id });
+    const ticketSetup = await CacheManager.getTicketSetupDI(guild.id);
 
     if (!ticketSetup) {
       return interaction.editReply({
