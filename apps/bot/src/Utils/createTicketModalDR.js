@@ -112,7 +112,7 @@ export function createTicketModalDR({ id, title, type }) {
             .setCustomId('pruebas_reporte')
             .setMinValues(1)
             .setMaxValues(3)
-            .setRequired(false)
+            .setRequired(true)
         )
     );
   }
