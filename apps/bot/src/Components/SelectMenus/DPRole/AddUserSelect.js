@@ -13,7 +13,7 @@ export default {
 
     // Verificar permisos
     const setup = await CacheManager.getTicketSetupDR(guild.id);
-    
+
     if (!setup) {
       return interaction.reply({
         content: '❌ Sistema no configurado.',
@@ -21,7 +21,7 @@ export default {
       });
     }
 
-    const hasPermission = 
+    const hasPermission =
       member.roles.cache.has(setup.SpInterno) ||
       member.roles.cache.has(setup.Supervisor) ||
       member.roles.cache.has(setup.SupGeneral) ||
@@ -37,6 +37,7 @@ export default {
     // Dar permisos a todos los usuarios seleccionados
     const addedUsers = [];
     const alreadyHasAccess = [];
+    const addedUserIds = [];
 
     for (const userId of values) {
       const targetUser = await guild.members.fetch(userId).catch(() => null);
@@ -56,6 +57,7 @@ export default {
       });
 
       addedUsers.push(targetUser.user.tag);
+      addedUserIds.push(targetUser.id);
     }
 
     let responseMessage = '';
@@ -74,7 +76,7 @@ export default {
     // Notificar en el canal si se agregaron usuarios
     if (addedUsers.length > 0) {
       await channel.send({
-        content: `👥 **Usuarios agregados** por ${member}: ${addedUsers.map(tag => `<@!${tag.split('#')[0]}>`).join(', ')}`,
+        content: `👥 **Usuarios agregados** por ${member}: ${addedUserIds.map((id) => `<@${id}>`).join(', ')}`,
       });
     }
   },
