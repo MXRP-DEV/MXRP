@@ -1,4 +1,4 @@
-import {
+﻿import {
   ModalSubmitInteraction,
   ChannelType,
   ContainerBuilder,
@@ -23,9 +23,14 @@ export default {
     const { guild, user, channel, message } = interaction;
     const reason = interaction.fields.getTextInputValue('Razon');
 
-    const ticket = await TicketUserVA.findOne({ TicketId: channel.id });
+    const ticket = await TicketUserVA.findOne({ ChannelId: channel.id });
     if (!ticket || ticket.Estado === 'cerrado') {
-      return interaction.editReply({ content: 'Este ticket no es válido o ya fue cerrado.' });
+      return interaction.editReply({ content: 'Este ticket no es valido o ya fue cerrado.' });
+    }
+    if (!ticket.StaffAsignado) {
+      return interaction.editReply({
+        content: 'No se puede cerrar un ticket sin reclamar primero.',
+      });
     }
 
     const setup = await CacheManager.getTicketSetupVA(guild.id);
@@ -35,7 +40,7 @@ export default {
 
     const logChannel = guild.channels.cache.get(setup.LogsId);
     if (!logChannel || logChannel.type !== ChannelType.GuildText) {
-      return interaction.editReply({ content: 'El canal de logs no es válido.' });
+      return interaction.editReply({ content: 'El canal de logs no es valido.' });
     }
 
     if (setup.OpenTicketRole && ticket.CreadorId) {
@@ -55,7 +60,7 @@ export default {
     });
 
     await logChannel.send({
-      content: `🔒 Ticket cerrado por <@${user.id}>\nRazón: ${reason} \nAtendido por: <@${ticket.StaffAsignado}>`,
+      content: `🔐 Ticket cerrado por <@${user.id}>\nRazón: ${reason} \nAtendido por: <@${ticket.StaffAsignado}>`,
       files: [transcript],
     });
 
@@ -87,7 +92,7 @@ export default {
       .addSectionComponents((section) =>
         section
           .addTextDisplayComponents((text) =>
-            text.setContent(`${textContent}\n\n🔒 **Ticket cerrado**\n**Razón:** ${reason}`)
+            text.setContent(`${textContent}\n\n🔐 **Ticket cerrado**\n**Razón:** ${reason}`)
           )
           .setThumbnailAccessory((thumb) =>
             thumb.setURL(client.user.displayAvatarURL({ size: 1024, extension: 'png' }))
@@ -120,7 +125,7 @@ export default {
     await message.edit({ components: [closedContainer] });
 
     await interaction.editReply({
-      content: 'El ticket se cerrará en 5 segundos.',
+      content: 'El ticket se cerrar en 5 segundos.',
     });
 
     setTimeout(() => {
