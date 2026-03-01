@@ -90,7 +90,7 @@ export default {
 
     const textContent = `🛡️ **Reporte de Staff**
 
-Estimado <@${user.id}>, un <@&${setup.RH}> revisará tu solicitud.
+Estimado <@${user.id}>, un <@&${setup.RH}> <@&${setup.AsuntosInternos}> revisará tu solicitud.
 **Asunto:** ${Asunto}
 **Detalles:** ${Detalles}
 
