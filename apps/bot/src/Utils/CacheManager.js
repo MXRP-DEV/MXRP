@@ -216,6 +216,23 @@ export class CacheManager {
     await redisManager.del(cacheKey);
   }
 
+  static async getNarcoBlogSetup(guildId) {
+    const cacheKey = `narcoblog_setup:${guildId}`;
+    return redisManager.getOrSet(
+      cacheKey,
+      async () => {
+        const NarcoBlogSetup = (await import('#database/models/MXRP/NarcoBlogSetup.js')).default;
+        return await NarcoBlogSetup.findOne({ GuildId: guildId }).lean();
+      },
+      CATEGORIES_TTL
+    );
+  }
+
+  static async invalidateNarcoBlogSetup(guildId) {
+    const cacheKey = `narcoblog_setup:${guildId}`;
+    await redisManager.del(cacheKey);
+  }
+
   static async clearAll() {
     if (!redisManager.isConnected) return false;
     try {

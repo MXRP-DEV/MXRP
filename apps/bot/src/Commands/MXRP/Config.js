@@ -56,5 +56,24 @@ export default {
             .setDescription('Rol de periodista (quien puede publicar)')
             .setRequired(true)
         )
+    )
+    .addSubcommand((sub) =>
+      sub
+        .setName('narcoblog')
+        .setDescription('Configurar sistema de NarcoBlog')
+        .addChannelOption((option) =>
+          option
+            .setName('registro')
+            .setDescription('Canal de logs internos (con ID de usuario)')
+            .addChannelTypes(ChannelType.GuildText)
+            .setRequired(true)
+        )
+        .addChannelOption((option) =>
+          option
+            .setName('notificar')
+            .setDescription('Canal público de notificaciones')
+            .addChannelTypes(ChannelType.GuildAnnouncement)
+            .setRequired(true)
+        )
     ),
 };
