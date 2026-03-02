@@ -6,7 +6,12 @@ export default {
   async execute(interaction, client) {
     if (!interaction.isButton()) return;
 
-    const button = client.buttons.get(interaction.customId);
+    let button = client.buttons.get(interaction.customId);
+
+    if (!button && interaction.customId.includes(':')) {
+      const dynamicId = interaction.customId.split(':')[0];
+      button = client.buttons.get(dynamicId);
+    }
 
     if (!button) {
       logger.debug(`Botón sin handler: ${interaction.customId}`);

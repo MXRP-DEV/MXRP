@@ -1,6 +1,8 @@
 import { redisManager } from './RedisClient.js';
 
 const DEFAULT_TTL = 300; // 5 minutos por defecto
+const ROLES_TTL = 12 * 60 * 60; // 12 Horas
+const CATEGORIES_TTL = 7 * 24 * 60 * 60; // 7 Días
 
 export class CacheManager {
   static async getTicketSetupVA(guildId) {
@@ -12,7 +14,7 @@ export class CacheManager {
           .default;
         return await TicketSetupVA.findOne({ GuildId: guildId }).lean();
       },
-      DEFAULT_TTL
+      CATEGORIES_TTL
     );
   }
 
@@ -29,7 +31,7 @@ export class CacheManager {
         const TicketSetupDI = (await import('#database/models/DPInterno/TicketSetupDI.js')).default;
         return await TicketSetupDI.findOne({ GuildId: guildId }).lean();
       },
-      DEFAULT_TTL
+      CATEGORIES_TTL
     );
   }
 
@@ -48,7 +50,7 @@ export class CacheManager {
         ).default;
         return await ApelacionBlacklistDI.findOne({ GuildId: guildId }).lean();
       },
-      DEFAULT_TTL
+      CATEGORIES_TTL
     );
   }
 
@@ -67,7 +69,7 @@ export class CacheManager {
         ).default;
         return await ApelacionDespidoDI.findOne({ GuildId: guildId }).lean();
       },
-      DEFAULT_TTL
+      CATEGORIES_TTL
     );
   }
 
@@ -85,7 +87,7 @@ export class CacheManager {
           .default;
         return await ApelacionWIPDI.findOne({ GuildId: guildId }).lean();
       },
-      DEFAULT_TTL
+      CATEGORIES_TTL
     );
   }
 
@@ -103,7 +105,7 @@ export class CacheManager {
           .default;
         return await InformeSetupVA.findOne({ GuildId: guildId }).lean();
       },
-      DEFAULT_TTL
+      CATEGORIES_TTL
     );
   }
 
@@ -120,12 +122,97 @@ export class CacheManager {
         const TicketSetupDR = (await import('#database/models/DPRole/TicketSetupDR.js')).default;
         return await TicketSetupDR.findOne({ GuildId: guildId }).lean();
       },
-      DEFAULT_TTL
+      CATEGORIES_TTL
     );
   }
 
   static async invalidateTicketSetupDR(guildId) {
     const cacheKey = `ticket_setup_dr:${guildId}`;
+    await redisManager.del(cacheKey);
+  }
+
+  static async getWarnSetupDR(guildId) {
+    const cacheKey = `warn_setup_dr:${guildId}`;
+    return redisManager.getOrSet(
+      cacheKey,
+      async () => {
+        const WarnSetupDR = (await import('#database/models/DPRole/WarnSetupDR.js')).default;
+        return await WarnSetupDR.findOne({ GuildId: guildId }).lean();
+      },
+      CATEGORIES_TTL
+    );
+  }
+
+  static async invalidateWarnSetupDR(guildId) {
+    const cacheKey = `warn_setup_dr:${guildId}`;
+    await redisManager.del(cacheKey);
+  }
+
+  static async getFaccionSetupDR(guildId) {
+    const cacheKey = `faccion_setup_dr:${guildId}`;
+    return redisManager.getOrSet(
+      cacheKey,
+      async () => {
+        const FaccionSetupDR = (await import('#database/models/DPRole/FaccionSetupDR.js')).default;
+        return await FaccionSetupDR.findOne({ GuildId: guildId }).lean();
+      },
+      CATEGORIES_TTL
+    );
+  }
+
+  static async invalidateFaccionSetupDR(guildId) {
+    const cacheKey = `faccion_setup_dr:${guildId}`;
+    await redisManager.del(cacheKey);
+  }
+
+  static async getTicketSetupMXRP(guildId) {
+    const cacheKey = `ticket_setup_mxrp:${guildId}`;
+    return redisManager.getOrSet(
+      cacheKey,
+      async () => {
+        const TicketSetupMXRP = (await import('#database/models/MXRP/TicketSetupMXRP.js')).default;
+        return await TicketSetupMXRP.findOne({ GuildId: guildId }).lean();
+      },
+      CATEGORIES_TTL
+    );
+  }
+
+  static async invalidateTicketSetupMXRP(guildId) {
+    const cacheKey = `ticket_setup_mxrp:${guildId}`;
+    await redisManager.del(cacheKey);
+  }
+
+  static async getTicketPermisosMXRP(guildId) {
+    const cacheKey = `ticket_permisos_mxrp:${guildId}`;
+    return redisManager.getOrSet(
+      cacheKey,
+      async () => {
+        const TicketPermisos = (await import('#database/models/MXRP/TicketPermisos.js')).default;
+        return await TicketPermisos.findOne({ GuildId: guildId }).lean();
+      },
+      ROLES_TTL
+    );
+  }
+
+  static async invalidateTicketPermisosMXRP(guildId) {
+    const cacheKey = `ticket_permisos_mxrp:${guildId}`;
+    await redisManager.del(cacheKey);
+  }
+
+  static async getPeriodicoSetup(guildId) {
+    const cacheKey = `periodico_setup:${guildId}`;
+    return redisManager.getOrSet(
+      cacheKey,
+      async () => {
+        const PeriodicoSetup = (await import('#database/models/MXRP/PeriodicoSetup.js')).default;
+        return await PeriodicoSetup.findOne({ GuildId: guildId }).lean();
+      },
+      CATEGORIES_TTL
+    );
+  }
+
+  static async invalidatePeriodicoSetup(guildId) {
+    const cacheKey = `periodico_setup:${guildId}`;
     await redisManager.del(cacheKey);
   }
 
