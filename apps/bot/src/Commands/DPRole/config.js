@@ -70,5 +70,48 @@ export default {
             .setDescription('Role relacionado a Supervisor General')
             .setRequired(true)
         )
+    )
+    .addSubcommand((sub) =>
+      sub
+        .setName('warns')
+        .setDescription('Configurar sistema de warns faccionarios')
+        .addChannelOption((option) =>
+          option
+            .setName('panel')
+            .setDescription('Canal del panel de warns')
+            .addChannelTypes(ChannelType.GuildText)
+            .setRequired(true)
+        )
+        .addChannelOption((opt) =>
+          opt
+            .setName('verificacion')
+            .setDescription('Canal de verificación de solicitudes')
+            .addChannelTypes(ChannelType.GuildText)
+            .setRequired(true)
+        )
+        .addRoleOption((option) =>
+          option.setName('admin').setDescription('Rol administrador de warns').setRequired(true)
+        )
+        .addRoleOption((option) =>
+          option
+            .setName('verificador')
+            .setDescription('Rol verificador de solicitudes')
+            .setRequired(true)
+        )
+    )
+    .addSubcommand((sub) =>
+      sub
+        .setName('facciones')
+        .setDescription('Configurar sistema de facciones')
+        .addChannelOption((option) =>
+          option
+            .setName('panel')
+            .setDescription('Canal del panel de facciones')
+            .addChannelTypes(ChannelType.GuildText)
+            .setRequired(true)
+        )
+        .addRoleOption((option) =>
+          option.setName('gestor').setDescription('Rol gestor de facciones').setRequired(true)
+        )
     ),
 };
