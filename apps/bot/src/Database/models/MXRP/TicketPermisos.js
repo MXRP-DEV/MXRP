@@ -37,7 +37,6 @@ const PermisosSchema = new Schema({
 
   // Otros Staff
   INE: { type: String },
-  Etica: { type: String },
   SupervisorFaccionario: { type: String },
   DirectorSoporte: { type: String },
   AsuntosInternos: { type: String },
