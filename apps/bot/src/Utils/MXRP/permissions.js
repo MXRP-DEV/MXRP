@@ -26,7 +26,7 @@ export async function getCategoryRoles(guildId, categoryKey) {
     Otros: [perms.Moderador, perms.SoporteTecnico],
     Disenadores: [perms.HeadDiseñador, perms.Diseñador],
     Reclamar: [perms.AuditorTesoreria, perms.Tesoreria],
-    ReporteAnonimo: [perms.RH, perms.AsuntosInternos, perms.perms.AI],
+    ReporteAnonimo: [perms.RH, perms.AsuntosInternos, perms.AI],
     SoporteVip: [perms.Moderador, perms.SoporteTecnico, perms.Tesoreria],
     SoportePrioritario: [perms.Moderador, perms.SoporteTecnico, perms.Tesoreria],
   };
