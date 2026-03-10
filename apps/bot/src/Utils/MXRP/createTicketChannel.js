@@ -41,7 +41,9 @@ export async function createTicketChannel({
           Boolean
         )
       : categoryKey === 'SoportePrioritario'
-        ? [setup.RolesVip?.MXRPPass].filter(Boolean)
+        ? [setup.RolesVip?.Vip, setup.RolesVip?.InversorMXRP, setup.RolesVip?.ServerBooster].filter(
+            Boolean
+          )
         : [];
 
   if (openerRoles.length) {
