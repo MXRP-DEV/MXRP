@@ -19,7 +19,7 @@
   "scripts": {
     "dev": "node index.js",
     "start": "node index.js",
-    "lint": "eslint . --ext .js",
+    "lint": "eslint .",
     "format": "prettier --write \"**/*.{js,json,md}\"",
     "format:check": "prettier --check \"**/*.{js,json,md}\""
   },
